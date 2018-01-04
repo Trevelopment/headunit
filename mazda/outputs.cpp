@@ -248,7 +248,7 @@ void VideoOutput::input_thread_func()
                     //Make the music button play/pause
                     case KEY_E:
                         printf("KEY_E\n");
-                        scanCode = HUIB_PLAYPAUSE;
+                        scanCode = HUIB_MUSIC;
                         break;
                     case KEY_LEFTBRACE:
                         printf("KEY_LEFTBRACE (next track with media focus: %i)\n",  hasMediaAudioFocus ? 1 : 0);
@@ -353,7 +353,7 @@ void VideoOutput::input_thread_func()
                         else
                         {
                             // Opens the music screen
-                            scanCode = HUIB_MUSIC;
+                            scanCode = HUIB_PLAYPAUSE;
                         }
                         break;
                     }
