@@ -2,61 +2,85 @@
 
 DEBUG=0
 
-SCRIPT="/resources/aio/bin/headunit"
+SCRIPT="/tmp/data_persist/dev/bin/headunit"
 SCRIPTPATH=$(dirname "$SCRIPT")
+
+conf='{
+    "launchOnDevice": true,
+    "carGPS": true,
+    "wifiTransport": false,
+    "reverseGPS": false
+}'
+
+if ! [ -e /tmp/root/headunit.json ]; then
+ printf "%s\n" "$conf" > /tmp/root/headunit.json
+fi
 
 start_headunit()
 {
-  taskset 0xFFFFFFFF "${SCRIPTPATH}/headunit" "$@" > /tmp/mnt/data/headunit.log 2>&1 &
+   rm -f /tmp/root/headunit-wireless.status
+   sed -i 's."wifiTransport": true."wifiTransport": false.g' /tmp/root/headunit.json
+   taskset 0xFFFFFFFF "${SCRIPTPATH}/headunit" "$@" > /dev/null 2>&1 &
+   sleep 2
+   touch /tmp/root/headunit.status
 }
 
 start_AAwireless()
 {
-  taskset 0xFFFFFFFF "${SCRIPTPATH}/headunit-wireless" "$@" > /tmp/mnt/data/headunit.log 2>&1 &
+    rm -f /tmp/root/headunit.status
+    sed -i 's."wifiTransport": false."wifiTransport": true.g' /tmp/root/headunit.json
+    taskset 0xFFFFFFFF "${SCRIPTPATH}/headunit" "$@" > /dev/null 2>&1 &
+    sleep 2
+    touch /tmp/root/headunit-wireless.status
 }
 
 export LD_LIBRARY_PATH="${SCRIPTPATH}/headunit_libs:/jci/lib:/jci/opera/3rdpartylibs/freetype:/usr/lib/imx-mm/audio-codec:/usr/lib/imx-mm/parser:/resources/aio/lib:"
 #override some GST plugins with these
 export GST_PLUGIN_PATH="/resources/aio/lib"
 
-taskset 0xFFFFFFFF "${SCRIPTPATH}/headunit" "$@" 2>&1 >/dev/null &
-sleep 3
+rm -f /tmp/root/headunit.status
+rm -f /tmp/root/headunit-wireless.status
+
+pkill -f 'aap_service'
+pkill -f 'carplayd'
+PID=`ps |grep L_jciCARPLAY|head -1|awk '{print $1}'`
+kill -9 $PID
+
+start_headunit
+sleep 2
 
 while true
 do
- NET_CHECK=`netstat -rn|awk '$2=="192.168.43.1" {print}'|wc -l|awk '{print $1}'`
+ NET_CHECK=`netstat -rn|awk '$2=="192.168.43.1" {print}'|wc -l`
+
  if [ -e /tmp/root/usb_connect ]; then
   USBCHECK=1
  else
   USBCHECK=0
  fi
- 
+
  if [ $NET_CHECK == 1 ] && [ $USBCHECK == 0 ]; then
-    [ $DEBUG == 1 ] &&  echo "Start WiFi"  >> /tmp/root/headunit.log   
-    #WIFI=1, USB=0
-    PS=$(/usr/bin/pgrep 'headunit$')
-    [ $DEBUG == 1 ] && echo "n=$NET_CHECK u=$USBCHECK PS=$PS"  >> /tmp/root/headunit.log  
-    if ! [ -z $PS ]; then
-         [ $DEBUG == 1 ] && echo " /usr/bin/killall -9 headunit " >> /tmp/root/headunit.log
-        /usr/bin/killall -9 headunit  >> /tmp/root/headunit.log
-        sleep 1
+    #echo "WLAN"
+    if [ -e /tmp/root/headunit.status ]; then
+        killall -q headunit
     fi
 
-    if [ -z $(/usr/bin/pgrep headunit-w) ]; then
+    if ! [ -e /tmp/root/headunit-wireless.status ]; then
         #echo "Start WIRELESS"
         start_AAwireless
     fi
- else
-    [ $DEBUG == 1 ] && echo "Start USB"  >> /tmp/root/headunit.log   
-    PS=$(/usr/bin/pgrep headunit-w)
-    [ $DEBUG == 1 ] && echo "n=$NET_CHECK u=$USBCHECK PS=$PS"  >> /tmp/root/headunit.log  
-    if ! [ -z $PS ]; then
-         [ $DEBUG == 1 ] && echo "found USB , kill headunit-wireless"  >> /tmp/root/headunit.log
-        /usr/bin/killall -9 headunit-wireless  >> /tmp/root/headunit.log
-        sleep 1
-    fi
 
-    if [ -z $(/usr/bin/pgrep 'headunit$') ]; then
+ else
+    #echo "USB"
+    check_headunit=`ps|grep headunit|grep -v grep|wc -l|awk '{print $1}'`
+
+    [ $check_headunit -eq 1 ] && rm -f /tmp/root/headunit-wireless.status
+    [ $check_headunit -eq 1 ] && rm -f /tmp/root/headunit.status
+
+    if [ -e /tmp/root/headunit-wireless.status ]; then
+        killall -q headunit
+    fi
+    if ! [ -e /tmp/root/headunit.status ]; then
         #echo "Start USB"
         start_headunit
     fi
