@@ -29,6 +29,9 @@ public:
     }
 
     virtual void GPSDiagnostics(const uint8_t& dTCId, const uint8_t& dTCAction) override {}
+    virtual void OneTimeDRDiagnostics(const std::string& dRUnitVersion, const int32_t& antennaStatus, const bool& gyroSelfTest, const bool& accelSelfTest, const bool& resetLearning, const bool& saveLearning) override {}
+    virtual void PeriodicDRDiagnostics(const int32_t& dRUnitStatus, const int32_t& speedPulse, const bool& reverse, const int32_t& dRUnitMode, const int32_t& gyroStatus, const int32_t& accelStatus) override {}
+
 };
 
 class GPSLDSControl : public com::jci::lds::control_proxy,

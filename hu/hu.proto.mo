@@ -390,10 +390,11 @@ message ChannelDescriptor
         }
 
         required uint32 minimum_interval_ms = 1;
-        enum CLUSTER_TYPE
-        {
-            CUSTOM_IMAGES_SUPPORTED = 1;
-            IMAGE_CODES_ONLY = 2;
+        required uint32 type = 2;
+	enum CLUSTER_TYPE
+	{
+	     CUSTOM_IMAGES_SUPPORTED = 1;
+	     IMAGE_CODES_ONLY = 2;
         }
         required CLUSTER_TYPE type = 2;
         optional ImageOptions image_options = 3;
@@ -741,8 +742,7 @@ message NAVTurnMessage
     optional int32 turn_number = 5;
     optional int32 turn_angle = 6;
 }
-
-//32773   (0x8005)
+ //32773   (0x8005)
 message NAVDistanceMessage
 {
     optional int32 distance = 1; //meters

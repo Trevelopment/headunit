@@ -4,6 +4,7 @@
 #include "audio.h"
 #include "main.h"
 #include "bt/mzd_bluetooth.h"
+#include "hud/hud.h"
 #include "config.h"
 
 #include "json/json.hpp"
@@ -541,7 +542,7 @@ void AudioManagerClient::audioMgrReleaseAudioFocus()
     {
         //nothing to do
         callbacks.AudioFocusHappend(currentFocus);
-    }    
+    }
     else if (currentFocus == FocusType::PERMANENT && previousSessionID >= 0)
     {
         //We released the last one, give up audio focus for real
@@ -649,4 +650,21 @@ void AudioManagerClient::Notify(const std::string &signalName, const std::string
     }
 }
 
+void MazdaEventCallbacks::HandleNaviStatus(IHUConnectionThreadInterface& stream, const HU::NAVMessagesStatus &request){
+}
 
+extern NaviData *navi_data;
+
+void MazdaEventCallbacks::HandleNaviTurn(IHUConnectionThreadInterface& stream, const HU::NAVTurnMessage &request){
+  navi_data->event_name = request.event_name();
+  navi_data->turn_event = request.turn_event();
+  navi_data->turn_side = request.turn_side();
+  navi_data->turn_number = request.turn_number();
+  navi_data->turn_angle = request.turn_angle();
+  hud_update();
+}
+void MazdaEventCallbacks::HandleNaviTurnDistance(IHUConnectionThreadInterface& stream, const HU::NAVDistanceMessage &request){
+    navi_data->distance = request.distance();
+    navi_data->time_until = request.time_until();
+    hud_update();
+}

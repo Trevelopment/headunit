@@ -26,6 +26,7 @@
 
 #include "nm/mzd_nightmode.h"
 #include "gps/mzd_gps.h"
+#include "hud/hud.h"
 
 #include "audio.h"
 #include "main.h"
@@ -221,6 +222,8 @@ int main (int argc, char *argv[])
 
             DBus::Connection serviceBus(SERVICE_BUS_ADDRESS, false);
             serviceBus.register_bus();
+
+	    hud_start();
 
             MazdaEventCallbacks callbacks(serviceBus, hmiBus);
             HUServer headunit(callbacks);

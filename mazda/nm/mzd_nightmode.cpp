@@ -23,6 +23,7 @@ public:
     virtual void ShutdownRequest() override {}
     virtual void FactoryReset() override {}
     virtual void ShowNavigation() override {}
+    virtual void ShowNaviScreen(const int32_t& screenId) override {}
     virtual void RequestShowNavigationDenied() override {}
     virtual void ClearStack() override {}
     virtual void FavoriteLongPress() override {}
@@ -38,6 +39,8 @@ public:
     virtual void JpjVDEHypothesisList(const ::DBus::Struct< int32_t, std::vector< ::DBus::Struct< uint32_t, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t > > >& jpjHypothesisList) override {}
     virtual void VDEHypothesisList(const ::DBus::Struct< int32_t, std::vector< ::DBus::Struct< uint32_t, uint32_t, uint32_t, uint32_t > > >& vDEList) override {}
     virtual void SimpleHypothesisList(const ::DBus::Struct< int32_t, std::vector< ::DBus::Struct< uint32_t > > >& idList) override {}
+    virtual void UniVDEHypothesisList(const ::DBus::Struct< int32_t, std::vector< ::DBus::Struct< std::string > > >& uniVDEHypothesisList) override {}
+    virtual void UniSimpleHypothesisList(const ::DBus::Struct< int32_t, std::vector< ::DBus::Struct< std::string > > >& uniSimpleHypothesisList) override {}
     virtual void ModeChanged(const int32_t& modality) override {}
     virtual void RequestGuidanceInfo() override {}
     virtual void NavigateToAddress(const std::string& name, const std::string& countryName, const std::string& stateName, const std::string& cityName, const std::string& streetName, const std::string& zipCode, const double& latitude, const double& longitude) override {}

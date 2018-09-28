@@ -43,14 +43,14 @@ SRCS += hud/hud.cpp
 SRCS += outputs.cpp
 SRCS += callbacks.cpp
 
-SRCS += main.cpp
+SRCS += hud-test.cpp
 
 SRCS += $(TOP)/common/config.cpp
 
 OBJS = $(addsuffix .arm.o, $(basename $(SRCS)))
 DEPS = $(addsuffix .arm.d, $(basename $(SRCS)))
 
-APP = headunit
+APP = hud-test
 
 all: tag proto dbusxx $(APP) 
 
