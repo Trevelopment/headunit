@@ -35,12 +35,6 @@
 #include "glib_utils.h"
 #include "config.h"
 
-#include "json/json.hpp"
-#include "config.h"
-
-using json = nlohmann::json;
-
-
 #define HMI_BUS_ADDRESS "unix:path=/tmp/dbus_hmi_socket"
 #define SERVICE_BUS_ADDRESS "unix:path=/tmp/dbus_service_socket"
 // Check the content folder. sd_nav still exists without the card installed
@@ -126,7 +120,7 @@ static void gps_thread_func(std::condition_variable& quitcv, std::mutex& quitmut
                 location->set_latitude(static_cast<int32_t>(data.latitude * 1E7));
                 location->set_longitude(static_cast<int32_t>(data.longitude * 1E7));
 
-                // If the sd card exists then reverse heading. This should only be used on installs that have the 
+                // If the sd card exists then reverse heading. This should only be used on installs that have the
                 // reversed heading issue.
                 double newHeading = data.heading;
 
@@ -135,7 +129,7 @@ static void gps_thread_func(std::condition_variable& quitcv, std::mutex& quitmut
                     const char* sdCardFolder;
                     sdCardFolder = SD_CARD_PATH;
                     struct stat sb;
-    
+
                     if (stat(sdCardFolder, &sb) == 0 && S_ISDIR(sb.st_mode))
                     {
                         newHeading = data.heading + 180;
@@ -144,7 +138,7 @@ static void gps_thread_func(std::condition_variable& quitcv, std::mutex& quitmut
                             newHeading = newHeading - 360;
                         }
                     }
-				}
+                }
 
                 location->set_bearing(static_cast<int32_t>(newHeading * 1E6));
                 //assuming these are the same units as the Android Location API (the rest are)

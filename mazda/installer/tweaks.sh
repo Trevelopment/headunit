@@ -199,8 +199,8 @@ revert_cmu_files()
         if [ ${reverted} -eq 0 ]; then
             log_message "by reverting changes ... "
             sed -i '/# Android Auto start/d' /jci/scripts/stage_wifi.sh &&
-                sed -i '/headunit-wrapper/d' /jci/scripts/stage_wifi.sh
-                sed -i '/check-usb.sh/d' /jci/scripts/stage_wifi.sh
+            sed -i '/headunit-wrapper/d' /jci/scripts/stage_wifi.sh &&
+            sed -i '/check-usb.sh/d' /jci/scripts/stage_wifi.sh
             if [ $? == 0 ]; then
                 log_message "DONE\n"
             else
