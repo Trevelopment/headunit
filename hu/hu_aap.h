@@ -277,7 +277,6 @@ protected:
   int hu_handle_NaviTurnDistance(int chan, byte * buf, int len);
 
 
-
     //Can be called from any thread
   virtual int hu_queue_command(IHUAnyThreadInterface::HUThreadCommand&& command) override;
 };
@@ -380,7 +379,6 @@ enum HU_INPUT_BUTTON
     HUIB_STOP = 0x7F,
     HUIB_MUSIC = 0xD1,
     HUIB_SCROLLWHEEL = 65536,
-
 };
 
 enum class HU_NAVI_CHANNEL_MESSAGE : uint16_t
@@ -389,4 +387,3 @@ enum class HU_NAVI_CHANNEL_MESSAGE : uint16_t
     Turn = 0x8004,
     TurnDistance = 0x8005,
 };
-    

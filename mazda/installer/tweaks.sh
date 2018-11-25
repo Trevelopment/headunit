@@ -137,6 +137,7 @@ modify_cmu_files()
             if cp -a /jci/scripts/stage_wifi.sh /jci/scripts/stage_wifi.sh.bak; then
                 echo "# Android Auto start" >> /jci/scripts/stage_wifi.sh
                 echo "headunit-wrapper &" >> /jci/scripts/stage_wifi.sh
+                echo "check-usb.sh &" >> /jci/scripts/stage_wifi.sh
                 log_message "autostart entry added to /jci/scripts/stage_wifi.sh ... DONE\n"
             else
                 log_message "backup failed so leaving file as is - there will be no autostart. FAILED\n"
@@ -199,6 +200,7 @@ revert_cmu_files()
             log_message "by reverting changes ... "
             sed -i '/# Android Auto start/d' /jci/scripts/stage_wifi.sh &&
                 sed -i '/headunit-wrapper/d' /jci/scripts/stage_wifi.sh
+                sed -i '/check-usb.sh/d' /jci/scripts/stage_wifi.sh
             if [ $? == 0 ]; then
                 log_message "DONE\n"
             else
@@ -221,6 +223,7 @@ copy_aa_binaries()
     chmod 755 /tmp/mnt/data_persist/dev/bin/headunit || "for headunit failed ... "
     chmod 755 /tmp/mnt/data_persist/dev/bin/headunit-wrapper || "for headunit-wrapper failed ... "
     chmod 755 /tmp/mnt/data_persist/dev/bin/headunit.json || "for headunit.json failed ... "
+    chmod 755 /tmp/mnt/data_persist/dev/bin/check-usb.sh  || "for check-usb.sh  failed ... "
     log_message "DONE\n"
 }
 
@@ -231,6 +234,7 @@ remove_aa_binaries()
     rm /tmp/mnt/data_persist/dev/bin/headunit || log_message "headunit failed ... "
     rm /tmp/mnt/data_persist/dev/bin/headunit-wrapper || log_message "headunit-wrapper failed ... "
     rm /tmp/mnt/data_persist/dev/bin/headunit.json || log_message "headunit.json failed ... "
+    rm /tmp/mnt/data_persist/dev/bin/check-usb.sh  || log_message "check-usb.sh failed ... "
     rm -rf /tmp/mnt/data_persist/dev/bin/headunit_libs || log_message "headunit_libs failed ... "
     rm -rf /jci/gui/apps/_androidauto || log_message "_androidauto failed ... "
     rm /jci/opera/opera_dir/userjs/additionalApps.* || "additionalApps.* failed ... "

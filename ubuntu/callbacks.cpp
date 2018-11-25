@@ -197,17 +197,3 @@ std::string DesktopCommandServerCallbacks::ChangeParameterConfig(std::string par
        return "Config updated";
     return "Config wasn't updated. Wrong parameters.";
 }
-
-void DesktopEventCallbacks::HandleNaviStatus(IHUConnectionThreadInterface& stream, const HU::NAVMessagesStatus &request){
-}
-
-void DesktopEventCallbacks::HandleNaviTurn(IHUConnectionThreadInterface& stream, const HU::NAVTurnMessage &request){
-    const char *event_name = &request.event_name()[0];
-    std::string image = request.image();
-    printf(event_name);
-    logv ("AA_CH_NAVI: %s, TurnSide: %d, TurnEvent:%d, TurnNumber: %d, TurnAngle: %d", event_name, request.turn_side(), request.turn_event(), request.turn_number(), request.turn_angle());
-    hex_dumpv("AA_CH_NAVI", 256, (unsigned char*)image.c_str(), image.length());
-}
-void DesktopEventCallbacks::HandleNaviTurnDistance(IHUConnectionThreadInterface& stream, const HU::NAVDistanceMessage &request){
-    logv ("AA_CH_NAVI: Distance: %d", request.distance());
-}

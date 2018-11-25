@@ -34,7 +34,6 @@
 
   }
 
-
   int HUServer::ihu_tra_start (HU_TRANSPORT_TYPE transportType, bool waitForDevice) {
     if (transportType == HU_TRANSPORT_TYPE::WIFI) {
       logd ("AA over Wifi");
@@ -117,7 +116,7 @@
 
   int log_packet_info = 1;
 
-  int HUServer::hu_aap_tra_send (int retry, byte * buf, int len, int tmo) {                  // Send Transport data: chan,flags,len,type,...
+  int HUServer::hu_aap_tra_send (int retry, byte * buf, int len, int tmo) {  // Send Transport data: chan,flags,len,type,...
                                                                         // Need to send when starting
     if (iaap_state != hu_STATE_STARTED && iaap_state != hu_STATE_STARTIN) {
       loge ("CHECK: iaap_state: %d (%s)", iaap_state, state_get (iaap_state));
@@ -1126,7 +1125,7 @@
       {
           logv ("AA_CH_NAVI");
           logv ("AA_CH_NAVI msg_type: %04x  len: %d  buf: %p", msg_type, len, buf);
-          hex_dumpv("AA_CH_NAVI", 80, buf, len);
+          hex_dump("AA_CH_NAVI", 80, buf, len);
           switch((HU_NAVI_CHANNEL_MESSAGE)msg_type)
           {
               case HU_NAVI_CHANNEL_MESSAGE::Status:
