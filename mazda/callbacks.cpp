@@ -531,11 +531,14 @@ void AudioManagerClient::audioMgrRequestAudioFocus(FocusType type)
     }
 
     int sessionId = aaTransientSessionID;
-    if (currentFocus == FocusType::NONE && type == FocusType::PERMANENT)
+    if(type == FocusType::PERMANENT)
     {
         sessionId = aaSessionID;
-        waitingForFocusLostEvent = true;
-        previousSessionID = -1;
+        if (currentFocus == FocusType::NONE)
+        {
+            waitingForFocusLostEvent = true;
+            previousSessionID = -1;
+        }
     }
     json args = { { "sessionId", sessionId } };
     std::string result = Request("requestAudioFocus", args.dump());
