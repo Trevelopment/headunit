@@ -75,6 +75,7 @@ private:
     std::string aaStreamName = "MLENT";
     int aaSessionID = -1;
     int aaTransientSessionID = -1;
+    int aaNaviSessionID = -1;
     int previousSessionID = -1;
     bool waitingForFocusLostEvent = false;
     MazdaEventCallbacks& callbacks;
