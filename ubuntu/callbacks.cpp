@@ -64,6 +64,7 @@ void DesktopEventCallbacks::CustomizeOutputChannel(int chan, HU::ChannelDescript
 }
 
 void DesktopEventCallbacks::AudioFocusRequest(int chan, const HU::AudioFocusRequest &request)  {
+    logw ("Focus Request %s: %d", chan_get(chan), request.focus_type());
     run_on_main_thread([this, chan, request](){
         HU::AudioFocusResponse response;
         if (request.focus_type() == HU::AudioFocusRequest::AUDIO_FOCUS_RELEASE) {
@@ -196,4 +197,16 @@ std::string DesktopCommandServerCallbacks::ChangeParameterConfig(std::string par
     if (updateHappened)
        return "Config updated";
     return "Config wasn't updated. Wrong parameters.";
+}
+
+void DesktopEventCallbacks::HandleNaviStatus(IHUConnectionThreadInterface& stream, const HU::NAVMessagesStatus &request){
+}
+
+void DesktopEventCallbacks::HandleNaviTurn(IHUConnectionThreadInterface& stream, const HU::NAVTurnMessage &request){
+    const char *event_name = &request.event_name()[0];
+    printf(event_name);
+    logv ("AA_CH_NAVI: %s, TurnSide: %d, TurnEvent:%d, TurnNumber: %d, TurnAngle: %d", event_name, request.turn_side(), request.turn_event(), request.turn_number(), request.turn_angle());
+}
+void DesktopEventCallbacks::HandleNaviTurnDistance(IHUConnectionThreadInterface& stream, const HU::NAVDistanceMessage &request){
+    logv ("AA_CH_NAVI: Distance: %d", request.distance());
 }

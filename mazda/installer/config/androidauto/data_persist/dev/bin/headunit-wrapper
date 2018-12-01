@@ -12,13 +12,13 @@ export GST_PLUGIN_PATH="${SCRIPTPATH}/headunit_libs:/usr/lib/gstreamer-0.10"
 DEBUG=0
 
 if ! [ -e /tmp/root/headunit.json ]; then
- cp ${SCRIPTPATH}/headunit.json /tmp/root/
+ cp "${SCRIPTPATH}/headunit.json" /tmp/root/
 fi
 
 start_headunit()
 {
    rm -f /tmp/root/headunit-wireless.status
-   sed -i 's."wifiTransport": true."wifiTransport": false.g' /tmp/root/headunit.json 
+   sed -i 's."wifiTransport": true."wifiTransport": false.g' /tmp/root/headunit.json
    taskset 0xFFFFFFFF "${SCRIPTPATH}/headunit" "$@" > /dev/null 2>&1 &
    sleep 2
    touch /tmp/root/headunit.status
@@ -30,7 +30,7 @@ start_headunit()
 start_AAwireless()
 {
     rm -f /tmp/root/headunit.status
-    sed -i 's."wifiTransport": false."wifiTransport": true.g' /tmp/root/headunit.json 
+    sed -i 's."wifiTransport": false."wifiTransport": true.g' /tmp/root/headunit.json
     taskset 0xFFFFFFFF "${SCRIPTPATH}/headunit" "$@" > /dev/null 2>&1 &
     sleep 2
     touch /tmp/root/headunit-wireless.status
@@ -47,7 +47,7 @@ pkill -f 'aap_service'
 #default USB
 start_headunit
 
-# loop forever. every 5 seconds, 
+# loop forever. every 5 seconds,
 while true
 do
  NET_CHECK=`netstat -rn|awk '$2=="192.168.43.1" {print}'|wc -l|awk '{print $1}'`
@@ -73,9 +73,9 @@ do
 
  else
     #echo "USB"
-    [ $DEBUG -eq 1 ] && echo "USB Mode" >> ${LOGPATH} 
+    [ $DEBUG -eq 1 ] && echo "USB Mode" >> ${LOGPATH}
     check_headunit=`ps|grep 'bin/headunit'|grep -v wrapper|grep -v grep|wc -l|awk '{print $1}'`
-    [ $DEBUG -eq 1 ] && echo "check_headunit = $check_headunit" >> ${LOGPATH} 
+    [ $DEBUG -eq 1 ] && echo "check_headunit = $check_headunit" >> ${LOGPATH}
 
     [ $check_headunit -eq 0 ] && rm -f /tmp/root/headunit-wireless.status /tmp/root/headunit.status
 
