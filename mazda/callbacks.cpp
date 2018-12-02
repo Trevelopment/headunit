@@ -95,10 +95,8 @@ void MazdaEventCallbacks::AudioFocusRequest(int chan, const HU::AudioFocusReques
             audioMgrClient->audioMgrReleaseAudioFocus();
         } else {
             if (!inCall) {
-                if (request.focus_type() == HU::AudioFocusRequest::AUDIO_FOCUS_GAIN_TRANSIENT) {
+                if (request.focus_type() == HU::AudioFocusRequest::AUDIO_FOCUS_GAIN_TRANSIENT || request.focus_type() == HU::AudioFocusRequest::AUDIO_FOCUS_GAIN_NAVI) {
                     audioMgrClient->audioMgrRequestAudioFocus(AudioManagerClient::FocusType::TRANSIENT); //assume media
-                } else if (request.focus_type() == HU::AudioFocusRequest::AUDIO_FOCUS_GAIN_NAVI) {
-                    audioMgrClient->audioMgrRequestAudioFocus(AudioManagerClient::FocusType::NAVI); //Navigation
                 } else if (request.focus_type() == HU::AudioFocusRequest::AUDIO_FOCUS_GAIN) {
                     audioMgrClient->audioMgrRequestAudioFocus(AudioManagerClient::FocusType::PERMANENT); //assume media
                 }
@@ -161,9 +159,6 @@ void MazdaEventCallbacks::AudioFocusHappend(AudioManagerClient::FocusType type) 
     switch(type) {
       case AudioManagerClient::FocusType::TRANSIENT:
         response.set_focus_type(HU::AudioFocusResponse::AUDIO_FOCUS_STATE_GAIN_TRANSIENT);
-        break;
-      case AudioManagerClient::FocusType::NAVI:
-        response.set_focus_type(HU::AudioFocusResponse::AUDIO_FOCUS_STATE_GAIN_TRANSIENT_GUIDANCE_ONLY);
         break;
       case AudioManagerClient::FocusType::PERMANENT:
         response.set_focus_type(HU::AudioFocusResponse::AUDIO_FOCUS_STATE_GAIN);
@@ -401,41 +396,8 @@ void AudioManagerClient::aaRegisterStream()
             loge("Failed to parse state json: %s", ex.what());
         }
 
-        // Stream is registered add it to the array (not needed because we use
-        // multiple SessionIDs on single StreamName and handle internally)
-        // streamToSessionIds[aaStreamName] = aaTransientSessionID;
-    }
-    if (aaNaviSessionID < 0)
-    {
-        try
-        {
-            std::string sessString = Request("openSession", sessArgs.dump());
-            printf("openSession(%s)\n%s\n", sessArgs.dump().c_str(), sessString.c_str());
-            aaNaviSessionID = json::parse(sessString)["sessionId"];
-
-            // Register the stream
-            json regArgs = {
-                { "sessionId", aaNaviSessionID },
-                { "streamName", aaStreamName },
-                { "streamModeName", aaStreamName },
-                { "focusType", "navi" },
-                { "streamType", "InfoMix" }
-            };
-            std::string regString = Request("registerAudioStream", regArgs.dump());
-            printf("registerAudioStream(%s)\n%s\n", regArgs.dump().c_str(), regString.c_str());
-        }
-        catch (const std::domain_error& ex)
-        {
-            loge("Failed to parse state json: %s", ex.what());
-        }
-        catch (const std::invalid_argument& ex)
-        {
-            loge("Failed to parse state json: %s", ex.what());
-        }
-
-        // Stream is registered add it to the array (not needed because we use
-        // multiple SessionIDs on single StreamName and handle internally)
-        // streamToSessionIds[aaStreamName] = aaNaviSessionID;
+        // Stream is registered add it to the array
+        streamToSessionIds[aaStreamName] = aaSessionID;
     }
 
 
@@ -489,11 +451,8 @@ void AudioManagerClient::populateStreamTable()
             {
                 if (aaSessionID < 0)
                     aaSessionID = sessionId;
-                else if (aaTransientSessionID <0)
-                    aaTransientSessionID = sessionId;
                 else
-                    aaNaviSessionID = sessionId;
-
+                    aaTransientSessionID = sessionId;
             }
             else
             {
@@ -502,7 +461,7 @@ void AudioManagerClient::populateStreamTable()
             }
         }
         // Create and register stream (only if we need to)
-        if (aaSessionID < 0 || aaTransientSessionID < 0 || aaNaviSessionID < 0)
+        if (aaSessionID < 0 || aaTransientSessionID < 0)
         {
             aaRegisterStream();
         }
@@ -524,7 +483,7 @@ AudioManagerClient::AudioManagerClient(MazdaEventCallbacks& callbacks, DBus::Con
     , callbacks(callbacks)
 {
     populateStreamTable();
-    if (aaSessionID < 0 || aaTransientSessionID < 0 || aaNaviSessionID < 0)
+    if (aaSessionID < 0 || aaTransientSessionID < 0)
     {
         loge("Can't find audio stream. Audio will not work");
     }
@@ -539,7 +498,7 @@ AudioManagerClient::~AudioManagerClient()
         printf("requestAudioFocus(%s)\n%s\n", args.dump().c_str(), result.c_str());
     }
 
-    for (int session : {aaSessionID, aaTransientSessionID, aaNaviSessionID})
+    for (int session : {aaSessionID, aaTransientSessionID })
     {
         if (session >= 0)
         {
@@ -550,7 +509,7 @@ AudioManagerClient::~AudioManagerClient()
     }
 }
 
-bool AudioManagerClient::canSwitchAudio() { return aaSessionID >= 0 && aaTransientSessionID >= 0 && aaNaviSessionID >= 0; }
+bool AudioManagerClient::canSwitchAudio() { return aaSessionID >= 0 && aaTransientSessionID >= 0; }
 
 void AudioManagerClient::audioMgrRequestAudioFocus(FocusType type)
 {
@@ -576,10 +535,6 @@ void AudioManagerClient::audioMgrRequestAudioFocus(FocusType type)
             previousSessionID = -1;
         }
     }
-    else if (type == FocusType::NAVI)
-    {
-        sessionId = aaNaviSessionID;
-    }
     json args = { { "sessionId", sessionId } };
     std::string result = Request("requestAudioFocus", args.dump());
     printf("requestAudioFocus(%s)\n%s\n", args.dump().c_str(), result.c_str());
@@ -601,16 +556,9 @@ void AudioManagerClient::audioMgrReleaseAudioFocus()
         printf("requestAudioFocus(%s)\n%s\n", args.dump().c_str(), result.c_str());
         previousSessionID = -1;
     }
-    else if (currentFocus == FocusType::TRANSIENT)
+    else if (currentFocus == FocusType::TRANSIENT || currentFocus == FocusType::NAVI)
     {
         json args = { { "sessionId", aaTransientSessionID } };
-        std::string result = Request("abandonAudioFocus", args.dump());
-        printf("abandonAudioFocus(%s)\n%s\n", args.dump().c_str(), result.c_str());
-        previousSessionID = -1;
-    }
-    else if (currentFocus == FocusType::NAVI)
-    {
-        json args = { { "sessionId", aaNaviSessionID } };
         std::string result = Request("abandonAudioFocus", args.dump());
         printf("abandonAudioFocus(%s)\n%s\n", args.dump().c_str(), result.c_str());
         previousSessionID = -1;
@@ -641,15 +589,11 @@ void AudioManagerClient::Notify(const std::string &signalName, const std::string
                 {
                     eventSessionID = aaSessionID;
                 }
-                else if (focusType == "transient")
+                else
                 {
                     eventSessionID = aaTransientSessionID;
                 }
-                else
-                {
-                    eventSessionID = aaNaviSessionID;
-                }
-                logd("Found audio sessionId %i for stream %s with focusType %s & newFocus %s\n", eventSessionID, streamName.c_str(), focusType.c_str(), newFocus.c_str());
+                logd("Found audio sessionId %i for stream %s\n", eventSessionID, streamName.c_str());
             }
             else
             {
@@ -676,7 +620,7 @@ void AudioManagerClient::Notify(const std::string &signalName, const std::string
                 FocusType newFocusType = currentFocus;
                 if (newFocus != "gained")
                 {
-                    if (eventSessionID == aaSessionID || eventSessionID == aaTransientSessionID || eventSessionID == aaNaviSessionID)
+                    if (eventSessionID == aaSessionID || eventSessionID == aaTransientSessionID)
                     {
                         newFocusType = FocusType::NONE;
                     }
@@ -690,10 +634,6 @@ void AudioManagerClient::Notify(const std::string &signalName, const std::string
                     else if (eventSessionID == aaSessionID)
                     {
                         newFocusType = FocusType::PERMANENT;
-                    }
-                    else if (eventSessionID == aaNaviSessionID)
-                    {
-                        newFocusType = FocusType::NAVI;
                     }
                 }
 

@@ -464,7 +464,7 @@
       inner->set_type(HU::STREAM_TYPE_VIDEO);
       auto videoConfig = inner->add_video_configs();
       videoConfig->set_resolution(HU::ChannelDescriptor::OutputStreamChannel::VideoConfig::VIDEO_RESOLUTION_800x480);
-      videoConfig->set_frame_rate(HU::ChannelDescriptor::OutputStreamChannel::VideoConfig::VIDEO_FPS_30);
+      videoConfig->set_frame_rate(HU::ChannelDescriptor::OutputStreamChannel::VideoConfig::VIDEO_FPS_60);
       videoConfig->set_margin_width(0);
       videoConfig->set_margin_height(0);
       videoConfig->set_dpi(140);
