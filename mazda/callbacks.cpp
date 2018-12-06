@@ -125,6 +125,7 @@ std::string MazdaEventCallbacks::GetCarBluetoothAddress()
     return get_bluetooth_mac_address();
 }
 
+
 void MazdaEventCallbacks::takeVideoFocus() {
     run_on_main_thread([this](){
         videoMgrClient->requestVideoFocus(VIDEO_FOCUS_REQUESTOR::HEADUNIT);
@@ -348,7 +349,7 @@ void AudioManagerClient::aaRegisterStream()
             json regArgs = {
                 { "sessionId", aaSessionID },
                 { "streamName", aaStreamName },
-                { "streamModeName", aaStreamName },
+                // { "streamModeName", aaStreamName },
                 { "focusType", "permanent" },
                 { "streamType", "Media" }
             };
@@ -380,7 +381,7 @@ void AudioManagerClient::aaRegisterStream()
             json regArgs = {
                 { "sessionId", aaTransientSessionID },
                 { "streamName", aaStreamName },
-                { "streamModeName", aaStreamName },
+                // { "streamModeName", aaStreamName },
                 { "focusType", "transient" },
                 { "streamType", "InfoUser" }
             };

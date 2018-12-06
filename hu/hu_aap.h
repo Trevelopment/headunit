@@ -45,6 +45,7 @@ inline const char * chan_get (int chan) {
     case AA_CH_BT: return ("AA_CH_BT");
     case AA_CH_PSTAT: return ("AA_CH_PSTAT");
     case AA_CH_NOT: return ("AA_CH_NOT");
+    case AA_CH_NAVI: return ("AA_CH_NAVI");
   }
   return ("<Invalid>");
 }
@@ -365,7 +366,6 @@ enum HU_INPUT_BUTTON
     HUIB_BACK = 0x04,
     HUIB_PHONE = 0x05,
     HUIB_CALLEND = 0x06,
-    //HUIB_NAV = 0x07,
     HUIB_UP = 0x13,
     HUIB_DOWN = 0x14,
     HUIB_LEFT = 0x15,
@@ -379,6 +379,13 @@ enum HU_INPUT_BUTTON
     HUIB_STOP = 0x7F,
     HUIB_MUSIC = 0xD1,
     HUIB_SCROLLWHEEL = 65536,
+    HUIB_MEDIA = 65537,
+    HUIB_NAVIGATION = 65538,
+    HUIB_RADIO = 65539,
+    HUIB_TEL = 65540,
+    HUIB_PRIMARY_BUTTON = 65541,
+    HUIB_SECONDARY_BUTTON = 65542,
+    HUIB_TERTIARY_BUTTON = 65543,
 };
 
 enum class HU_NAVI_CHANNEL_MESSAGE : uint16_t

@@ -420,27 +420,33 @@
       tsConfig->set_height(480);
 
       //No idea what these mean since they aren't the same as HU_INPUT_BUTTON
-      inner->add_keycodes_supported(HUIB_MENU); // 0x01 Open menu
-      inner->add_keycodes_supported(HUIB_MIC1); // 0x02 Mic
-      inner->add_keycodes_supported(HUIB_HOME); // 0x03 AA home
+      inner->add_keycodes_supported(HUIB_MENU); // 0x01 Soft Left (Menu)
+      inner->add_keycodes_supported(HUIB_MIC1); // 0x02 Soft Right (Mic)
+      inner->add_keycodes_supported(HUIB_HOME); // 0x03 Home
       inner->add_keycodes_supported(HUIB_BACK); // 0x04 Back
-      inner->add_keycodes_supported(HUIB_PHONE); // 0x05 Phone screen
-      inner->add_keycodes_supported(HUIB_CALLEND); // 0x06 End call
-      //inner->add_keycodes_supported(HUIB_NAV); // 0x07 Nav (This one is not correct)
+      inner->add_keycodes_supported(HUIB_PHONE); // 0x05 Call
+      inner->add_keycodes_supported(HUIB_CALLEND); // 0x06 End Call
       inner->add_keycodes_supported(HUIB_UP); // 0x13 Up
       inner->add_keycodes_supported(HUIB_DOWN); // 0x14 Down
-      inner->add_keycodes_supported(HUIB_LEFT); // 0x15 Left/Menu
-      inner->add_keycodes_supported(HUIB_RIGHT); // 0x16 Right/Mic
+      inner->add_keycodes_supported(HUIB_LEFT); // 0x15 Left (Menu)
+      inner->add_keycodes_supported(HUIB_RIGHT); // 0x16 Right (Mic)
       inner->add_keycodes_supported(HUIB_ENTER); // 0x17 Select
-      inner->add_keycodes_supported(HUIB_MIC); // 0x54 Mic again
+      inner->add_keycodes_supported(HUIB_MIC); // 0x54 Search (Mic)
       inner->add_keycodes_supported(HUIB_PLAYPAUSE); // 0x55 Play/Pause
-      inner->add_keycodes_supported(HUIB_NEXT); // 0x57 Next track
+      inner->add_keycodes_supported(HUIB_NEXT); // 0x57 Next Track
       inner->add_keycodes_supported(HUIB_PREV); // 0x58 Prev Track
       inner->add_keycodes_supported(HUIB_MUSIC); // 0xD1 Music Screen
-      inner->add_keycodes_supported(HUIB_SCROLLWHEEL);
-      // Might as well include these even if we dont use them
-      inner->add_keycodes_supported(HUIB_START); // 0x7E (126) Start media
-      inner->add_keycodes_supported(HUIB_STOP); // 0x7F (127) Stop media
+      inner->add_keycodes_supported(HUIB_SCROLLWHEEL); // 65536 Comand Knob Rotate
+      inner->add_keycodes_supported(HUIB_TEL); // 65537 Phone
+      inner->add_keycodes_supported(HUIB_NAVIGATION); // 65538 Navigation
+      inner->add_keycodes_supported(HUIB_MEDIA); // 65539 Media
+	  // Might as well include these even if we dont use them
+      inner->add_keycodes_supported(HUIB_RADIO); // 65540 Radio (Doesn't Do Anything)
+      inner->add_keycodes_supported(HUIB_PRIMARY_BUTTON); // 65541 Primary (Doesn't Do Anything)
+      inner->add_keycodes_supported(HUIB_SECONDARY_BUTTON); // 65542 Secondary (Doesn't Do Anything)
+      inner->add_keycodes_supported(HUIB_TERTIARY_BUTTON); // 65543 Tertiary (Doesn't Do Anything)
+      inner->add_keycodes_supported(HUIB_START); // 0x7E (126) Start Media
+      inner->add_keycodes_supported(HUIB_STOP); // 0x7F (127) Stop Media
 
       callbacks.CustomizeInputConfig(*inner);
 
@@ -464,7 +470,7 @@
       inner->set_type(HU::STREAM_TYPE_VIDEO);
       auto videoConfig = inner->add_video_configs();
       videoConfig->set_resolution(HU::ChannelDescriptor::OutputStreamChannel::VideoConfig::VIDEO_RESOLUTION_800x480);
-      videoConfig->set_frame_rate(HU::ChannelDescriptor::OutputStreamChannel::VideoConfig::VIDEO_FPS_60);
+      videoConfig->set_frame_rate(HU::ChannelDescriptor::OutputStreamChannel::VideoConfig::VIDEO_FPS_30);
       videoConfig->set_margin_width(0);
       videoConfig->set_margin_height(0);
       videoConfig->set_dpi(140);
@@ -607,7 +613,7 @@
       logd ("Navigation Focus Request: %d", request.focus_type());
 
     HU::NavigationFocusResponse response;
-    response.set_focus_type(2); // Gained / Gained Transient ?
+    response.set_focus_type(7); // Gained / Gained Transient? / 7 = AUDIO_FOCUS_STATE_GAIN_TRANSIENT_GUIDANCE_ONLY?
     return hu_aap_enc_send_message(0, chan, HU_PROTOCOL_MESSAGE::NavigationFocusResponse, response);
   }
 

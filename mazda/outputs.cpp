@@ -236,7 +236,7 @@ void VideoOutput::input_thread_func()
                     int32_t scrollAmount = 0;
                     bool isPressed = (event.value == 1);
                     AudioManagerClient::FocusType audioFocus = callbacks->audioFocus;
-                    bool hasMediaAudioFocus = audioFocus == AudioManagerClient::FocusType::PERMANENT;
+                    bool hasMediaAudioFocus = audioFocus != AudioManagerClient::FocusType::NONE;
 
                     //printf("Key code %i value %i\n", (int)event.code, (int)event.value);
                     switch (event.code)
@@ -248,7 +248,7 @@ void VideoOutput::input_thread_func()
                     //Make the music button play/pause
                     case KEY_E:
                         printf("KEY_E\n");
-                        scanCode = HUIB_PLAYPAUSE;
+						scanCode = HUIB_MUSIC;
                         break;
                     case KEY_LEFTBRACE:
                         printf("KEY_LEFTBRACE (next track with media focus: %i)\n",  hasMediaAudioFocus ? 1 : 0);
@@ -317,7 +317,7 @@ void VideoOutput::input_thread_func()
                         break;
                     case KEY_R: // NAV
                         printf("KEY_R\n");
-                        scanCode = HUIB_HOME;
+                        scanCode = HUIB_NAVIGATION;
                         break;
                     case KEY_Z: // CALL ANS
                         printf("KEY_Z\n");
@@ -330,30 +330,40 @@ void VideoOutput::input_thread_func()
                         { // This is just for testing although it may be a useful feature if we polish it a little
                           fprintf(stderr, "EVIOCGRAB failed to ungrab %s\n", EVENT_DEVICE_KBD);
                         }
-                        else
+						else
 #endif
-                        { // we can do this since this button does nothing when not on a call
-                          scanCode = HUIB_CALLEND;
-                        }
+						if (hasMediaAudioFocus && !callbacks->inCall)
+						{
+							if (isPressed)
+							{
+
+							}
+							else
+							{	//do it on release to avoid key bounce/repeat
+								callbacks->releaseAudioFocus(); //This will also pause audio automatically in AA
+							}
+						}
+						else
+						{	// we can do this since this button does nothing when not on a call
+							scanCode = HUIB_CALLEND;
+						}
                         break;
                     case KEY_T: // FAV
                         printf("KEY_T (any audio focus: %i media focus: %i)\n", int(audioFocus), hasMediaAudioFocus ? 1 : 0);
-                        if (audioFocus != AudioManagerClient::FocusType::NONE)
+                        if (hasMediaAudioFocus)
                         {
                             if (isPressed)
                             {
 
                             }
                             else
-                            {
-                              //do it on release to avoid key bounce/repeat
-                              callbacks->releaseAudioFocus(); //This will also pause audio automatically in AA
+                            {	//do it on release to avoid key bounce/repeat
+                              	callbacks->releaseAudioFocus(); //This will also pause audio automatically in AA
                             }
                         }
                         else
-                        {
-                            // Opens the music screen
-                            scanCode = HUIB_MUSIC;
+                        {	// if we don't have audio focus takes focus by playing music
+                            scanCode = HUIB_PLAYPAUSE;
                         }
                         break;
                     }
