@@ -236,7 +236,8 @@ void VideoOutput::input_thread_func()
                     int32_t scrollAmount = 0;
                     bool isPressed = (event.value == 1);
                     AudioManagerClient::FocusType audioFocus = callbacks->audioFocus;
-                    bool hasMediaAudioFocus = audioFocus != AudioManagerClient::FocusType::NONE;
+                    bool hasMediaAudioFocus = audioFocus == AudioManagerClient::FocusType::PERMANENT;
+                    bool hasAudioFocus = audioFocus != AudioManagerClient::FocusType::NONE;
 
                     //printf("Key code %i value %i\n", (int)event.code, (int)event.value);
                     switch (event.code)
@@ -321,7 +322,7 @@ void VideoOutput::input_thread_func()
                         break;
                     case KEY_Z: // CALL ANS
                         printf("KEY_Z\n");
-                        scanCode = HUIB_PHONE;
+                        scanCode = HUIB_TEL;
                         break;
                     case KEY_X: // CALL END
                         printf("KEY_X\n");
@@ -332,7 +333,7 @@ void VideoOutput::input_thread_func()
                         }
 						else
 #endif
-						if (hasMediaAudioFocus && !callbacks->inCall)
+						if (hasAudioFocus && !callbacks->inCall)
 						{
 							if (isPressed)
 							{
@@ -350,7 +351,7 @@ void VideoOutput::input_thread_func()
                         break;
                     case KEY_T: // FAV
                         printf("KEY_T (any audio focus: %i media focus: %i)\n", int(audioFocus), hasMediaAudioFocus ? 1 : 0);
-                        if (hasMediaAudioFocus)
+                        if (hasAudioFocus)
                         {
                             if (isPressed)
                             {

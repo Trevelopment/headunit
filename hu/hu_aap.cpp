@@ -613,7 +613,7 @@
       logd ("Navigation Focus Request: %d", request.focus_type());
 
     HU::NavigationFocusResponse response;
-    response.set_focus_type(7); // Gained / Gained Transient? / 7 = AUDIO_FOCUS_STATE_GAIN_TRANSIENT_GUIDANCE_ONLY?
+    response.set_focus_type(2); // Gained / Gained Transient ?
     return hu_aap_enc_send_message(0, chan, HU_PROTOCOL_MESSAGE::NavigationFocusResponse, response);
   }
 
