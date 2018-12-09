@@ -311,10 +311,7 @@ void VideoOutput::input_thread_func()
                         break;
                     case KEY_HOME:
                         printf("KEY_HOME\n");
-                        if (isPressed) {
-                            //go back to home screen
-                            callbacks->releaseVideoFocus();
-                        }
+                        scanCode = HUIB_HOME;
                         break;
                     case KEY_R: // NAV
                         printf("KEY_R\n");
@@ -333,16 +330,9 @@ void VideoOutput::input_thread_func()
                         }
 						else
 #endif
-						if (hasAudioFocus && !callbacks->inCall)
-						{
-							if (isPressed)
-							{
-
-							}
-							else
-							{	//do it on release to avoid key bounce/repeat
-								callbacks->releaseAudioFocus(); //This will also pause audio automatically in AA
-							}
+						if (!callbacks->inCall && isPressed)
+                        {	//go back to home screen
+                            callbacks->releaseVideoFocus();
 						}
 						else
 						{	// we can do this since this button does nothing when not on a call
