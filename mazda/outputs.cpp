@@ -249,7 +249,7 @@ void VideoOutput::input_thread_func()
                     //Make the music button play/pause
                     case KEY_E:
                         printf("KEY_E\n");
-						scanCode = HUIB_MUSIC;
+                        scanCode = HUIB_MUSIC;
                         break;
                     case KEY_LEFTBRACE:
                         printf("KEY_LEFTBRACE (next track with media focus: %i)\n",  hasMediaAudioFocus ? 1 : 0);
@@ -326,24 +326,24 @@ void VideoOutput::input_thread_func()
 #ifdef IOGRAB_DEBUG
                         if(hasMediaAudioFocus && isPressed && ioctl(kbd_fd, EVIOCGRAB, 0) < 0)
                         { // This is just for testing although it may be a useful feature if we polish it a little
-                          fprintf(stderr, "EVIOCGRAB failed to ungrab %s\n", EVENT_DEVICE_KBD);
+                            fprintf(stderr, "EVIOCGRAB failed to ungrab %s\n", EVENT_DEVICE_KBD);
                         }
-						else
+						            else
 #endif
-						if (!callbacks->inCall && isPressed)
+						            if (!callbacks->inCall && isPressed)
                         {	//go back to home screen
                             callbacks->releaseVideoFocus();
-						}
-						else
-						{	// we can do this since this button does nothing when not on a call
-							scanCode = HUIB_CALLEND;
-						}
+						            }
+						            else
+					            	{	// we can do this since this button does nothing when not on a call
+						           	    scanCode = HUIB_CALLEND;
+                        }
                         break;
                     case KEY_T: // FAV
                         printf("KEY_T (any audio focus: %i media focus: %i)\n", int(audioFocus), hasMediaAudioFocus ? 1 : 0);
-                        if (!hasAudioFocus || !isPressed)
+                        if (!hasAudioFocus)
                         {	// if we don't have audio focus takes focus by playing music
-                            scanCode = HUIB_START;
+                           scanCode = HUIB_START;
                         }
                         else if (hasAudioFocus && !isPressed)
                         {	//do it on release to avoid key bounce/repeat
