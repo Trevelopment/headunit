@@ -1,5 +1,6 @@
 {
     "launchOnDevice": true,
     "carGPS": true,
-    "wifiTransport": false
+    "wifiTransport": false,
+    "reverseGPS": false
 }

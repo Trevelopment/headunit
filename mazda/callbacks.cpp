@@ -125,6 +125,7 @@ std::string MazdaEventCallbacks::GetCarBluetoothAddress()
     return get_bluetooth_mac_address();
 }
 
+
 void MazdaEventCallbacks::takeVideoFocus() {
     run_on_main_thread([this](){
         videoMgrClient->requestVideoFocus(VIDEO_FOCUS_REQUESTOR::HEADUNIT);
@@ -157,15 +158,16 @@ void MazdaEventCallbacks::AudioFocusHappend(AudioManagerClient::FocusType type) 
     audioFocus = type;
     HU::AudioFocusResponse response;
     switch(type) {
-        case AudioManagerClient::FocusType::NONE:
-            response.set_focus_type(HU::AudioFocusResponse::AUDIO_FOCUS_STATE_LOSS);
-            break;
-        case AudioManagerClient::FocusType::PERMANENT:
-            response.set_focus_type(HU::AudioFocusResponse::AUDIO_FOCUS_STATE_GAIN);
-            break;
-        case AudioManagerClient::FocusType::TRANSIENT:
-            response.set_focus_type(HU::AudioFocusResponse::AUDIO_FOCUS_STATE_GAIN_TRANSIENT);
-            break;
+      case AudioManagerClient::FocusType::TRANSIENT:
+        response.set_focus_type(HU::AudioFocusResponse::AUDIO_FOCUS_STATE_GAIN_TRANSIENT);
+        break;
+      case AudioManagerClient::FocusType::PERMANENT:
+        response.set_focus_type(HU::AudioFocusResponse::AUDIO_FOCUS_STATE_GAIN);
+        break;
+      case AudioManagerClient::FocusType::NONE:
+      default:
+        response.set_focus_type(HU::AudioFocusResponse::AUDIO_FOCUS_STATE_LOSS);
+        break;
     }
     g_hu->hu_queue_command([response](IHUConnectionThreadInterface & s) {
         s.hu_aap_enc_send_message(0, AA_CH_CTR, HU_PROTOCOL_MESSAGE::AudioFocusResponse, response);
@@ -347,7 +349,7 @@ void AudioManagerClient::aaRegisterStream()
             json regArgs = {
                 { "sessionId", aaSessionID },
                 { "streamName", aaStreamName },
-                //{ "streamModeName", aaStreamName },
+                // { "streamModeName", aaStreamName },
                 { "focusType", "permanent" },
                 { "streamType", "Media" }
             };
@@ -379,7 +381,7 @@ void AudioManagerClient::aaRegisterStream()
             json regArgs = {
                 { "sessionId", aaTransientSessionID },
                 { "streamName", aaStreamName },
-                //{ "streamModeName", aaStreamName },
+                // { "streamModeName", aaStreamName },
                 { "focusType", "transient" },
                 { "streamType", "InfoUser" }
             };
@@ -517,7 +519,6 @@ void AudioManagerClient::audioMgrRequestAudioFocus(FocusType type)
         audioMgrReleaseAudioFocus();
         return;
     }
-
     printf("audioMgrRequestAudioFocus(%i)\n", int(type));
     if (currentFocus == type)
     {
@@ -525,12 +526,17 @@ void AudioManagerClient::audioMgrRequestAudioFocus(FocusType type)
         return;
     }
 
-    if (currentFocus == FocusType::NONE && type == FocusType::PERMANENT)
+    int sessionId = aaTransientSessionID;
+    if(type == FocusType::PERMANENT)
     {
-        waitingForFocusLostEvent = true;
-        previousSessionID = -1;
+        sessionId = aaSessionID;
+        if (currentFocus == FocusType::NONE)
+        {
+            waitingForFocusLostEvent = true;
+            previousSessionID = -1;
+        }
     }
-    json args = { { "sessionId", type == FocusType::TRANSIENT ? aaTransientSessionID : aaSessionID } };
+    json args = { { "sessionId", sessionId } };
     std::string result = Request("requestAudioFocus", args.dump());
     printf("requestAudioFocus(%s)\n%s\n", args.dump().c_str(), result.c_str());
 }
@@ -551,7 +557,7 @@ void AudioManagerClient::audioMgrReleaseAudioFocus()
         printf("requestAudioFocus(%s)\n%s\n", args.dump().c_str(), result.c_str());
         previousSessionID = -1;
     }
-    else if (currentFocus == FocusType::TRANSIENT)
+    else if (currentFocus == FocusType::TRANSIENT || currentFocus == FocusType::NAVI)
     {
         json args = { { "sessionId", aaTransientSessionID } };
         std::string result = Request("abandonAudioFocus", args.dump());
@@ -588,7 +594,7 @@ void AudioManagerClient::Notify(const std::string &signalName, const std::string
                 {
                     eventSessionID = aaTransientSessionID;
                 }
-                logd("Found audio sessionId %i for stream %s\n", aaSessionID, streamName.c_str());
+                logd("Found audio sessionId %i for stream %s\n", eventSessionID, streamName.c_str());
             }
             else
             {
@@ -596,7 +602,7 @@ void AudioManagerClient::Notify(const std::string &signalName, const std::string
                 if (findIt != streamToSessionIds.end())
                 {
                     eventSessionID = findIt->second;
-                    logd("Found audio sessionId %i for stream %s\n", eventSessionID, streamName.c_str());
+                    logd("Found audio sessionId %i for stream %s with focusType %s & newFocus %s\n", eventSessionID, streamName.c_str(), focusType.c_str(), newFocus.c_str());
                 }
                 else
                 {

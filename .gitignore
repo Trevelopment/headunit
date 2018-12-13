@@ -9,3 +9,6 @@ cmake-build-debug/
 mazda/installer/config/androidauto/data_persist/dev/bin/headunit
 *.creator.user
 bin/
+*/version\.h
+
+ubuntu/version\.h

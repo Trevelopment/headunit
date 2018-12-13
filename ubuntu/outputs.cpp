@@ -185,6 +185,20 @@ gboolean VideoOutput::sdl_poll_event() {
                             s.hu_aap_enc_send_message(0, AA_CH_TOU, HU_INPUT_CHANNEL_MESSAGE::InputEvent, inputEvent2);
                         });
                     }
+                } else if (key->keysym.sym == SDLK_l) {
+                    buttonInfo->set_scan_code(HUIB_MEDIA);
+                } else if (key->keysym.sym == SDLK_k) {
+                    buttonInfo->set_scan_code(HUIB_NAVIGATION);
+                } else if (key->keysym.sym == SDLK_j) {
+                    buttonInfo->set_scan_code(HUIB_RADIO);
+                } else if (key->keysym.sym == SDLK_h) {
+                    buttonInfo->set_scan_code(HUIB_TEL);
+                } else if (key->keysym.sym == SDLK_y) {
+                    buttonInfo->set_scan_code(HUIB_PRIMARY_BUTTON);
+                } else if (key->keysym.sym == SDLK_u) {
+                    buttonInfo->set_scan_code(HUIB_SECONDARY_BUTTON);
+                } else if (key->keysym.sym == SDLK_i) {
+                    buttonInfo->set_scan_code(HUIB_TERTIARY_BUTTON);
                 } else if (key->keysym.sym == SDLK_m) {
                     buttonInfo->set_scan_code(HUIB_MIC);
                 } else if (key->keysym.sym == SDLK_p) {

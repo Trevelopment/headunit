@@ -59,13 +59,13 @@ uint8_t roundabout(int32_t degrees){
 
 void hud_thread_func(std::condition_variable& quitcv, std::mutex& quitmutex, std::mutex& hudmutex){
   std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-  while (true)
+  //Don't bother with the HUD if we aren't connected via dbus
+  while (hud_installed())
   {
+    // if (hud_client == NULL) {
+    //   return;
+    // }
     hudmutex.lock();
-    if (hud_client == NULL) {
-      //Don't bother with the HUD if we aren't connected via dbus
-      return;
-    }
 
     uint32_t diricon;
     if(navi_data->turn_event == 13){
