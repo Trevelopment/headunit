@@ -14,7 +14,7 @@ namespace
 	}
 }
 
-CommandServer::CommandServer(ICommandServerCallbacks&callbacks)
+CommandServer::CommandServer(ICommandServerCallbacks &callbacks)
 {
     server.get("/status", [&callbacks](WPP::Request& req, WPP::Response& resp)
     {

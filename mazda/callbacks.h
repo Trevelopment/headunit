@@ -68,7 +68,6 @@ public:
         NONE,
         PERMANENT,
         TRANSIENT,
-        NAVI
     };
 private:
     std::map<std::string, int> streamToSessionIds;

@@ -98,10 +98,10 @@ function AAdisplayError(location, err)
 
 function AAdisplayVersion(AAheadunitVersion)
 {
-    var pversion = document.getElementById('aaStatusText');
+    var pversion = document.getElementById('aaText1');
     if (pversion != null)
     {
-        pversion.innerHTML = "Android Auto Headunit App v" + AAheadunitVersion + "<br>" + pversion.innerHTML;
+        pversion.innerHTML = pversion.innerHTML + " " + AAheadunitVersion;
     }
 }
 

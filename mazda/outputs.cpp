@@ -341,13 +341,13 @@ void VideoOutput::input_thread_func()
                         break;
                     case KEY_T: // FAV
                         printf("KEY_T (any audio focus: %i media focus: %i)\n", int(audioFocus), hasMediaAudioFocus ? 1 : 0);
-                        if (hasAudioFocus && !isPressed)
+                        if (!hasAudioFocus || !isPressed)
+                        {	// if we don't have audio focus takes focus by playing music
+                            scanCode = HUIB_START;
+                        }
+                        else if (hasAudioFocus && !isPressed)
                         {	//do it on release to avoid key bounce/repeat
                             callbacks->releaseAudioFocus(); //This will also pause audio automatically in AA
-                        }
-                        else if (!hasAudioFocus || !isPressed)
-                        {	// if we don't have audio focus takes focus by playing music
-                            scanCode = HUIB_PLAYPAUSE;
                         }
                         break;
                     }
